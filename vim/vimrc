@@ -1,0 +1,131 @@
+"===============================================================
+" 基本設定
+"===============================================================
+set fenc=utf-8           " ファイルエンコーディングをUTF-8に設定
+set nobackup             " バックアップファイルを作成しない
+set noswapfile           " スワップファイルを作成しない
+set autoread             " 外部で変更されたファイルを自動読み込み
+set hidden               " バッファを非表示にしても編集を続行可能
+
+"===============================================================
+" 表示・操作の基本設定
+"===============================================================
+set showcmd              " コマンドを画面下部に表示
+set number               " 行番号表示
+set cursorline           " カーソル行をハイライト
+set showmatch            " 括弧の対応をハイライト
+set scrolloff=5          " カーソル周辺の余白行数
+set sidescrolloff=8      " 横方向のスクロール余白
+set lazyredraw           " 再描画を遅延し処理速度を向上
+
+"===============================================================
+" インデント・タブ設定
+"===============================================================
+set smartindent          " スマートインデント
+set expandtab            " タブ入力をスペースに変換
+set tabstop=2            " タブ幅を2スペースに設定
+set shiftwidth=2         " 自動インデント時の幅を2スペースに設定
+
+"===============================================================
+" クリップボード・検索設定
+"===============================================================
+set clipboard=unnamedplus  " ヤンク/ペーストをシステムクリップボードと連携
+set wrapscan             " 検索時にファイル先頭/末尾までラップする
+set hlsearch             " 検索キーワードをハイライト
+set incsearch
+
+
+"===============================================================
+" GUI設定（GUI版Vim用）
+"===============================================================
+set guifont=JetBrains\ Mono:h12
+
+"===============================================================
+" プラグイン管理 (vim-plug)
+"===============================================================
+call plug#begin('~/.vim/plugged')
+" NERDTree: ファイルツリー表示プラグイン
+Plug 'preservim/nerdtree'
+call plug#end()
+
+" NERDTree のトグル（Ctrl+n）
+nnoremap <C-n> :NERDTreeToggle<CR>
+
+"===============================================================
+" シンタックス（構文）設定
+"===============================================================
+syntax on
+syntax enable
+
+"===============================================================
+" 補完設定
+"===============================================================
+set completeopt=menu,menuone,noselect  " 補完メニュー設定：メニューを常に表示し、自動選択しない
+autocmd CompleteDone * pclose!           " 補完後にプレビューウィンドウを自動で閉じる
+autocmd InsertLeave * if pumvisible() == 0 | redraw! | endif  " 挿入モード終了時、補完メニューの残像を防止
+
+" ファイルタイプ別の補完設定
+autocmd FileType python     setlocal omnifunc=python3complete#Complete
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType html       setlocal omnifunc=htmlcomplete#CompleteTags
+
+" NERDTreeが唯一のウィンドウの場合はVimを終了
+autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree")) | quit | endif
+
+"===============================================================
+" カーソル位置のUnicode表示
+"===============================================================
+function! ShowUnicode()
+    try
+        let file_name = expand('%:t')         " 現在のファイル名
+        let line_num  = line('.')              " 現在行番号
+        let col_num   = col('.')               " 現在列番号
+        let char      = matchstr(getline('.'), '\%' . col_num . 'c.')  " カーソル位置の文字
+        let char_code = char2nr(char)           " 文字のUnicodeコード取得
+        echomsg printf('File: %s | x,y: %d,%d | Code: U+%04X', file_name, line_num, col_num, char_code)
+    catch
+        " エラー発生時は無視
+    endtry
+endfunction
+autocmd CursorMoved * call ShowUnicode()
+
+"===============================================================
+" howm（メモ管理）設定
+"===============================================================
+set runtimepath+=~/.qfixhowm
+let qfixmemo_mapleader = 'f'
+let howm_dir             = '~/Dropbox/Editor/vim/howm'
+let howm_filename        = '%Y/%m/%Y-%m-%d-%H%M%S.txt'
+let howm_fileencoding    = 'cp932'
+let howm_fileformat      = 'dos'
+set fileencodings=ucs-bom,utf-8,iso-2022-jp,euc-jp,cp932,utf-16le,utf-16,default
+set fileformats=dos,unix,mac
+
+"===============================================================
+" ファイル実行用関数
+"===============================================================
+function! RunFile()
+  " 現在のファイル拡張子を取得し、対応する実行コマンドを実行
+  let l:ext = expand('%:e')
+  if l:ext ==# 'py'
+    execute '!python ' . shellescape(expand('%'))
+  elseif l:ext ==# 'js'
+    execute '!node ' . shellescape(expand('%'))
+  elseif l:ext ==# 'sh'
+    execute '!bash ' . shellescape(expand('%'))
+  elseif l:ext ==# 'rb'
+    execute '!ruby ' . shellescape(expand('%'))
+  elseif l:ext ==# 'go'
+    execute '!go run ' . shellescape(expand('%'))
+  elseif l:ext ==# 'php'
+    execute '!php ' . shellescape(expand('%'))
+  elseif l:ext ==# 'pl'
+    execute '!perl ' . shellescape(expand('%'))
+  else
+    echo "File type not supported: " . l:ext
+  endif
+endfunction
+
+" F5 キーで保存後にファイル実行
+nnoremap <F5> :w<CR>:call RunFile()<CR>
+
