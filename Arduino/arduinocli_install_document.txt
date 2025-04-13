@@ -1,0 +1,157 @@
+以下は、Arduino-CLI v1.2.0（最新バージョン）をUbuntu環境にインストールし、ArduinoボードでLチカ（LED点滅）のサンプルプログラムを実行するためのドキュメントです。下記の手順に沿って作業を進めてください。
+
+---
+
+# Arduino-CLI v1.2.0 on Ubuntu  
+**インストールからLチカ実行までの手順**
+
+## 1. 事前準備
+
+- **OS**: Ubuntu 18.04以降
+- **Arduinoボード**: 例としてArduino Uno（他のボードの場合は、対応するコアをインストールしてください）
+- **USBケーブル**: ArduinoとPCを接続するため
+- **インターネット接続**: ダウンロードおよび更新に必要
+
+## 2. Arduino-CLI v1.2.0のインストール
+
+### 2.1. バイナリのダウンロードと展開
+
+1. ターミナルを開き、以下の正しいURLからバイナリ（Linux 64bit版）をダウンロードします。
+
+   ```bash
+   wget https://github.com/arduino/arduino-cli/releases/download/v1.2.0/arduino-cli_1.2.0_Linux_64bit.tar.gz
+   ```
+
+2. ダウンロードしたアーカイブを展開します。
+
+   ```bash
+   tar -xvf arduino-cli_1.2.0_Linux_64bit.tar.gz
+   ```
+
+3. 解凍により得られた `arduino-cli` バイナリをシステムパスに配置します（例：`/usr/local/bin`）。
+
+   ```bash
+   sudo mv arduino-cli /usr/local/bin/
+   sudo chmod +x /usr/local/bin/arduino-cli
+   ```
+
+### 2.2. 初期設定
+
+1. 初回実行で設定ファイルを生成します。
+
+   ```bash
+   arduino-cli config init
+   ```
+
+   生成された設定ファイル（通常は `~/.arduino15/arduino-cli.yaml`）は、必要に応じて編集可能です。
+
+2. Arduinoコアのインデックス情報を更新します。
+
+   ```bash
+   arduino-cli core update-index
+   ```
+
+## 3. Arduinoボードのセットアップ
+
+### 3.1. 対応コアのインストール
+
+Arduino Unoの場合は、Arduino AVRコアをインストールします。
+
+```bash
+arduino-cli core install arduino:avr
+```
+
+※ 他のボードの場合は、対応するコア（例：`arduino:samd`など）をインストールしてください。
+
+### 3.2. ボード接続の確認
+
+1. ArduinoボードをUSBケーブルで接続します。
+
+2. 接続されたシリアルポートとボード情報を確認します。
+
+   ```bash
+   arduino-cli board list
+   ```
+
+   ※ 出力例  
+   ```
+   Port         FQBN              Board Name
+   /dev/ttyACM0 arduino:avr:uno   Arduino Uno
+   ```
+   ※ シリアルポートの名称は環境により異なります。アップロード時に正しいポートを指定してください。
+
+## 4. Lチカ（LED点滅）のサンプルプログラム作成と実行
+
+### 4.1. サンプルスケッチの作成
+
+1. 作業用ディレクトリとスケッチ用フォルダを作成します。
+
+   ```bash
+   mkdir ~/arduino_projects
+   cd ~/arduino_projects
+   mkdir Blink
+   cd Blink
+   ```
+
+2. 下記の内容で `Blink.ino` ファイルを作成します。  
+   ※ Arduino標準のBlinkスケッチで、内蔵LED（通常はピン13）を1秒間隔で点滅させます。
+
+   ```cpp
+   // Blink.ino
+   // 内蔵LEDを1秒間隔で点滅させるサンプルプログラム
+
+   void setup() {
+     // LED_BUILTIN は通常Arduino Unoのピン13に対応
+     pinMode(LED_BUILTIN, OUTPUT);
+   }
+
+   void loop() {
+     digitalWrite(LED_BUILTIN, HIGH);   // LEDを点灯
+     delay(1000);                       // 1秒待機
+     digitalWrite(LED_BUILTIN, LOW);    // LEDを消灯
+     delay(1000);                       // 1秒待機
+   }
+   ```
+
+### 4.2. スケッチのコンパイル
+
+1. 以下のコマンドで、スケッチをコンパイルします。  
+   `--fqbn` オプションによりArduino UnoのFQBN（arduino:avr:uno）を指定します。
+
+   ```bash
+   arduino-cli compile --fqbn arduino:avr:uno ~/arduino_projects/Blink
+   ```
+
+   ※ 正常にコンパイルされると、実行可能なバイナリファイルが生成されます。
+
+### 4.3. スケッチのアップロード
+
+1. Arduinoボードの接続ポート（例：`/dev/ttyACM0`）を指定して、アップロードを実行します。
+
+   ```bash
+   arduino-cli upload -p /dev/ttyACM0 --fqbn arduino:avr:uno ~/arduino_projects/Blink
+   ```
+
+2. 正常にアップロードが完了すると、Arduinoボード上の内蔵LEDが1秒間隔で点滅し始めます。
+
+## 5. トラブルシューティング
+
+- **シリアルポートが見つからない場合**:  
+  - Arduinoが正しく接続されているか確認してください。  
+  - 必要に応じて、`sudo` を利用するか、ユーザーを `dialout` グループに追加してください。  
+    ```bash
+    sudo usermod -a -G dialout $USER
+    ```
+  - 変更後は、再ログインまたはシステムの再起動が必要です。
+
+- **コンパイルエラーが発生する場合**:  
+  - スケッチのフォルダ名と `.ino` ファイル名が一致しているか確認してください。  
+  - 必要なArduinoコアが正しくインストールされているか確認してください。
+
+- **アップロード時のエラー**:  
+  - 指定したシリアルポートが正しいか、`arduino-cli board list` コマンドで確認してください。  
+  - 他のアプリケーション（例：シリアルモニター）がポートを占有していないか確認してください。
+
+---
+
+このドキュメントに沿って作業することで、Arduino-CLI v1.2.0をUbuntuにインストールし、Arduino UnoでLチカサンプルプログラムを実行できる環境が整います。何か不明な点があれば、各ステップのログやエラーメッセージを参考に、設定や接続状況を再確認してください。
