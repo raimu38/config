@@ -46,10 +46,15 @@ set guifont=JetBrains\ Mono:h12
 call plug#begin('~/.vim/plugged')
 " NERDTree: ファイルツリー表示プラグイン
 Plug 'preservim/nerdtree'
+Plug 'lervag/vimtex'
 call plug#end()
 
 " NERDTree のトグル（Ctrl+n）
 nnoremap <C-n> :NERDTreeToggle<CR>
+let g:vimtex_compiler_method = 'latexmk'
+let g:vimtex_view_method = 'zathura'
+let g:vimtex_view_general_viewer = 'zathura'
+let g:vimtex_view_general_options = '--synctex-forward @line:@col:@tex @pdf'
 
 "===============================================================
 " シンタックス（構文）設定
@@ -89,17 +94,6 @@ function! ShowUnicode()
 endfunction
 autocmd CursorMoved * call ShowUnicode()
 
-"===============================================================
-" howm（メモ管理）設定
-"===============================================================
-set runtimepath+=~/.qfixhowm
-let qfixmemo_mapleader = 'f'
-let howm_dir             = '~/Dropbox/Editor/vim/howm'
-let howm_filename        = '%Y/%m/%Y-%m-%d-%H%M%S.txt'
-let howm_fileencoding    = 'cp932'
-let howm_fileformat      = 'dos'
-set fileencodings=ucs-bom,utf-8,iso-2022-jp,euc-jp,cp932,utf-16le,utf-16,default
-set fileformats=dos,unix,mac
 
 "===============================================================
 " ファイル実行用関数
