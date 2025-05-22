@@ -1,0 +1,7 @@
+[
+  {
+    "key": "ctrl+m",
+    "command": "-editor.action.toggleTabFocusMode"
+  }
+]
+

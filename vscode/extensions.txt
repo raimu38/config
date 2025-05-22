@@ -1,0 +1,8 @@
+bradlc.vscode-tailwindcss
+david-j-lee.github-dark-color-theme
+dbaeumer.vscode-eslint
+esbenp.prettier-vscode
+github.copilot
+github.copilot-chat
+oderwat.indent-rainbow
+vscodevim.vim
