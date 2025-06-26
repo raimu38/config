@@ -1,0 +1,219 @@
+"===============================================================
+" 基本設定 (Encoding, Backup, Buffer)
+"===============================================================
+set fenc=utf-8            " ファイルの内部エンコーディングを UTF-8 に統一します
+set nobackup              " ファイル保存時のバックアップファイル（~付き）を作成しません
+set noswapfile            " 編集中のスワップファイルを作成しません
+set autoread              " 他プロセスで変更されたファイルを自動的に再読み込みします
+set hidden                " 編集中のバッファを非表示にしても変更を保持します
+
+"===============================================================
+" 表示・操作の基本設定 (UI, Cursor, Scrolling)
+"===============================================================
+set showcmd               " コマンド入力中の内容を画面下部に表示します
+set number                " 行番号を表示します
+set cursorline            " カーソル行をハイライトして視認性を向上させます
+set showmatch             " 対応する括弧を一瞬ハイライトします
+set scrolloff=5           " カーソル上下に最低5行の余白を確保します
+set sidescrolloff=8       " カーソル左右に最低8列の余白を確保します
+set lazyredraw            " 大量テキスト操作時に画面再描画を遅延させます
+set whichwrap=b,s,h,l,<,>,[,],~ " 行頭・行末での左右移動を行き来できるようにします
+source $VIMRUNTIME/macros/matchit.vim  " <% %> や HTML タグのマッチングを有効化
+
+"===============================================================
+" タブ・インデント設定
+"===============================================================
+set smartindent           " 文法に応じた自動インデントを行います
+set autoindent            " 新しい行に前行と同じインデントを設定します
+set expandtab             " タブ入力をスペースに変換します
+set tabstop=2             " タブ幅をスペース2文字分に設定します
+set shiftwidth=2          " 自動インデント幅を2スペースに設定します
+set ambiwidth=double      " 全角文字を幅2として扱います
+
+"===============================================================
+" クリップボード・検索設定
+"===============================================================
+set clipboard=unnamedplus " システムクリップボードと Vim のヤンクを共有します
+set wrapscan              " 検索時にファイル末尾→先頭へラップします
+set incsearch             " 入力しながら検索結果を逐次表示します
+set hlsearch              " 検索キーワードをハイライトします
+set ignorecase            " 検索で大文字小文字を区別しません
+
+"===============================================================
+" GUI版 Vim 用設定
+"===============================================================
+if has("gui_running")
+  set guifont=JetBrains\ Mono:h12  " GUI 環境でフォントとサイズを指定します
+endif
+
+"----------------------------------------------------------
+" ステータスライン設定
+"----------------------------------------------------------
+set laststatus=2          " 常にステータスラインを表示します
+set showmode              " 現在のモード(挿入/ノーマル等)を表示します
+set showcmd               " コマンド入力内容をステータスライン下に表示します
+set ruler                 " ステータスライン右側に行・列番号を表示します
+
+"===============================================================
+" プラグイン管理 (vim-plug)
+"===============================================================
+call plug#begin('~/.vim/plugged')
+  " ファイルツリー表示プラグイン
+  Plug 'preservim/nerdtree'
+  " ソース整形(Prettier)連携プラグイン
+  Plug 'sbdchd/neoformat'
+  " 非同期リンター・フォーマッター
+  Plug 'dense-analysis/ale'
+  " LSP クライアントプラグイン
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+call plug#end()
+
+" プラグインのキーマッピング設定
+nnoremap <C-n> :NERDTreeToggle<CR>  " Ctrl+n で NERDTree の表示/非表示を切替えます
+inoremap <silent><expr> <C-m> pumvisible() ? coc#_select_confirm() : "\<CR>"  " 補完選択時の Enter 動作を最適化
+autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree")) | quit | endif "NERDTreeのみの時Vimを終了
+
+
+"===============================================================
+" シンタックスハイライト設定
+"===============================================================
+syntax on                 " シンタックスハイライトを有効化します
+syntax enable             " シンタックス解析を有効化します
+"colorscheme molokai       " カラースキームを Molokai に設定します
+ colorscheme lunaperche
+
+"===============================================================
+" 補完設定 (Omni-completion, メニュー)
+"===============================================================
+set completeopt=menu,menuone,noselect " 補完メニュー表示設定
+set wildmenu              " コマンドライン補完を強化します
+set history=5000          " コマンド・検索の履歴件数を設定します
+autocmd CompleteDone * pclose!       " 補完完了後にプレビューウィンドウを自動で閉じます
+autocmd InsertLeave * if pumvisible() == 0 | redraw! | endif  " 挿入モード終了時に画面をリフレッシュ
+
+" ファイルタイプ別の Omni-completion設定
+autocmd FileType python     setlocal omnifunc=python3complete#Complete
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType html       setlocal omnifunc=htmlcomplete#CompleteTags
+
+"===============================================================
+" カーソル位置の Unicode 情報表示 (コメントアウト例)
+"===============================================================
+""
+
+"function! ShowUnicode()
+"  try
+"    let file_name = expand('%:t')   " ファイル名
+"   let line_num  = line('.')       " 現在行番号
+"    let col_num   = col('.')        " 現在列番号
+"    let char      = matchstr(getline('.'), '\%' . col_num . 'c.')
+"    let char_code = char2nr(char)   " 文字コードを取得
+"    echomsg printf('File: %s | Line: %d, Col: %d | Code: U+%04X',
+"          \ file_name, line_num, col_num, char_code)
+"  catch
+"  endtry
+"endfunction
+"autocmd CursorMoved * call ShowUnicode()
+
+function! ShowUnicodeToStatusline()
+  let l:char = matchstr(getline('.'), '\%' . col('.') . 'c.')
+  let g:unicode_info = (strlen(l:char) > 0) ? printf('U+%04X', char2nr(l:char)) : ''
+endfunction
+
+autocmd CursorMoved,CursorMovedI * call ShowUnicodeToStatusline()
+
+
+
+
+"===============================================================
+" Latex 
+"===============================================================
+"Plug 'lervag/vimtex'
+"let g:vimtex_compiler_method = 'latexmk'
+"let g:vimtex_view_method = 'zathura'
+"let g:vimtex_view_general_viewer = 'zathura'
+"let g:vimtex_view_general_options = '--synctex-forward @line:@col:@tex @pdf'
+
+"===============================================================
+" howm (メモ管理) 設定
+"===============================================================
+set runtimepath+=~/.howm    " howmプラグインのパスを追加
+let qfixmemo_mapleader = 'f'    " howm起動のリーダーキーを設定
+let howm_dir             = '~/Dropbox/Editor/vim/howm'  " メモ保存先ディレクトリ
+let howm_filename        = '%Y/%m/%Y-%m-%d-%H%M%S.md'   " メモファイル名フォーマット
+let howm_fileencoding    = 'utf-8'  " メモファイルの文字コード
+let howm_fileformat      = 'unix'   " メモファイルの改行コード
+set encoding=utf-8
+set fileencodings=utf-8
+set fileencoding=utf-8
+set fileformats=unix
+set fileformat=unix
+
+"===============================================================
+" ファイル実行用関数
+"===============================================================
+function! RunFile()
+  let l:ext = expand('%:e')       " 現在編集ファイルの拡張子取得
+  if l:ext ==# 'py'
+    execute '!python3 ' . shellescape(expand('%'))
+  elseif l:ext ==# 'js'
+    execute '!node ' . shellescape(expand('%'))
+  elseif l:ext ==# 'sh'
+    execute '!bash ' . shellescape(expand('%'))
+  elseif l:ext ==# 'rb'
+    execute '!ruby ' . shellescape(expand('%'))
+  elseif l:ext ==# 'go'
+    execute '!go run ' . shellescape(expand('%'))
+  elseif l:ext ==# 'php'
+    execute '!php ' . shellescape(expand('%'))
+  elseif l:ext ==# 'pl'
+    execute '!perl ' . shellescape(expand('%'))
+  else
+    echo "File type not supported: " . l:ext
+  endif
+endfunction
+
+" F5 キーで保存＆RunFile() 実行
+nnoremap <F5> :w<CR>:call RunFile()<CR>
+
+"===============================================================
+" XTerm 用ブラケットペースト対応
+"===============================================================
+if &term =~ "xterm"
+  let &t_SI .= "\e[?2004h"    " ブラケットペースト開始シーケンスを追加
+  let &t_EI .= "\e[?2004l"    " ブラケットペースト終了シーケンスを追加
+  let &pastetoggle = "\e[201~"  " Pasteモード切替キーを定義
+
+  function XTermPasteBegin(ret)
+    set paste                 " Pasteモードを有効化
+    return a:ret
+  endfunction
+  inoremap <special> <expr> <Esc>[200~ XTermPasteBegin("")  " ブラケットペースト検知マッピング
+endif
+
+"===============================================================
+" neoformat (Prettier) 設定
+"===============================================================
+let g:neoformat_try_node_exe = 1             " Node 実行ファイルを自動検出
+let g:neoformat_enabled_javascript = ['prettier']
+let g:neoformat_enabled_typescript = ['prettier']
+autocmd BufWritePre *.js,*.jsx,*.ts,*.tsx Neoformat prettier  " 保存時に Prettier 実行
+
+"===============================================================
+" ALE (Lint) 設定
+"===============================================================
+let g:ale_lint_on_text_changed = 'always'  " 編集中もリアルタイムにリンティング
+let g:ale_lint_on_save          = 1       " 保存時にリンティングを実行
+
+" 言語ごとのリンター一覧を一行で定義（改行もコメントも不要）
+let g:ale_linters = {
+  \ 'javascript':      ['eslint'],
+  \ 'typescript':      ['tsserver', 'eslint'],
+  \ 'typescriptreact': ['tsserver', 'eslint'],
+  \ 'javascriptreact': ['eslint'],
+  \ 'python':          ['flake8', 'pylint'] }
+
+let g:ale_sign_error   = '>>'    " エラーサインの表示文字
+let g:ale_sign_warning = '--'    " 警告サインの表示文字
+let g:ale_open_list    = 0       " 自動でロケーションリストを開かない
+set signcolumn=number           " サインカラムを常に表示
