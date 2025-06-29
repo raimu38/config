@@ -31,5 +31,22 @@
     "terminal.ansiBrightMagenta": "#d532ce",
     "terminal.ansiBrightCyan": "#2cbce9",
     "terminal.ansiBrightWhite": "#ffffff"
+  },
+  "workbench.preferredHighContrastColorTheme": "GitHub Dark (Web Based)"
+
+"vim.normalModeKeyBindingsNonRecursive": [
+  {
+    "before": ["K"],
+    "commands": ["editor.action.showHover"]
+  },
+  {
+    "before": ["g", "d"],
+    "commands": ["editor.action.revealDefinition"]
+  },
+  {
+    "before": ["g", "r"],
+    "commands": ["editor.action.referenceSearch.trigger"]
   }
+]
 }
+

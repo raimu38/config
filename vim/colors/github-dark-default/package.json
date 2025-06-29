@@ -1,0 +1,8 @@
+{
+  "name": "vim-theme-gen",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "github-vscode-themes": "^6.3.4"
+  }
+}
