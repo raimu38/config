@@ -66,6 +66,7 @@ syntax on                 " シンタックスハイライトを有効化しま�
 filetype on
 filetype plugin on
 colorscheme github  " ~/.vim/colors/github.vimを入れる
+source ~/.vim/colors/ft_custom.vim
 
 "===============================================================
 " 補完設定 

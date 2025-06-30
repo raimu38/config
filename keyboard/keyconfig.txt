@@ -1,0 +1,12 @@
+# ① 日本語(Mozc) と 日本語(英数字) の２つだけを入力ソースに登録
+gsettings set org.gnome.desktop.input-sources sources "[('ibus','mozc-jp'),('xkb','jp')]"
+
+# ② XKBモデルを 106-key 日本語 に固定
+gsettings set org.gnome.desktop.input-sources xkb-model 'jp106'
+
+# ③ 不要オプションをリセット
+gsettings reset org.gnome.desktop.input-sources xkb-options
+
+# ④ IME 再起動
+ibus restart
+
