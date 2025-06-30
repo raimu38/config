@@ -115,15 +115,62 @@ augroup END
 "── Markdown ──────────────────────────────────────────────────────────────
 augroup ft_highlight_markdown
   autocmd!
-  autocmd FileType markdown    execute 'highlight markdownHeading   guifg=' . s:dark_keyword  . ' ctermfg=203'
-  autocmd FileType markdown    execute 'highlight markdownBold      guifg=' . s:dark_constant . ' ctermfg=151'
-  autocmd FileType markdown    execute 'highlight markdownItalic    guifg=' . s:dark_special  . ' ctermfg=205'
-  autocmd FileType markdown    execute 'highlight markdownCode      guifg=' . s:dark_string   . ' ctermfg=75'
-  autocmd FileType markdown    execute 'highlight markdownLinkText  guifg=' . s:dark_type     . ' ctermfg=214'
-  autocmd FileType markdown    execute 'highlight markdownUrl       guifg=' . s:dark_blue    . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownH1 guifg=' . s:dark_string    . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownH2 guifg=' . s:dark_orange_fg . ' ctermfg=173'
+  autocmd FileType markdown execute 'highlight markdownH3 guifg=' . s:dark_function  . ' ctermfg=225' 
+  autocmd FileType markdown execute 'highlight markdownH4 guifg=' . s:dark_string    . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownH5 guifg=' . s:dark_orange_fg . ' ctermfg=173'
+  autocmd FileType markdown execute 'highlight markdownH6 guifg=' . s:dark_fg_subtle . ' ctermfg=245'
+  autocmd FileType markdown execute 'highlight markdownHeading guifg=' . s:dark_string . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownBold guifg=' . s:dark_orange_fg . ' ctermfg=173'
+  autocmd FileType markdown execute 'highlight markdownItalic guifg=' . s:dark_fg_subtle . ' ctermfg=245'
+  autocmd FileType markdown execute 'highlight markdownCode guifg=' . s:dark_string . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownCodeBlock guifg=' . s:dark_fg_subtle . ' ctermfg=245'
+  autocmd FileType markdown execute 'highlight markdownLinkText guifg=' . s:dark_string . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownUrl guifg=' . s:dark_string . ' ctermfg=75'
+  autocmd FileType markdown execute 'highlight markdownBlockQuote guifg=' . s:dark_fg_subtle . ' ctermfg=245'
+  autocmd FileType markdown execute 'highlight markdownListMarker guifg=' . s:dark_orange_fg . ' ctermfg=173'
+  autocmd FileType markdown execute 'highlight markdownRule guifg=' . s:dark_fg_subtle . ' ctermfg=245'
 augroup END
-
 "── Plain Text (.txt) ─────────────────────────────────────────────────────
 " no syntax groups defined by default; falls back to Normal.
 " If you wish to colorize e.g. TODOs or comments, you can add custom patterns here.
+
+" CSV column highlighting (fixed regex)
+augroup ft_highlight_csv
+  autocmd!
+  autocmd FileType csv call s:SetupCSVHighlight()
+augroup END
+
+"─ Primer Core Palette ────────────────────────────────────────────────────────
+
+function! s:SetupCSVHighlight() abort
+  let colors = [
+        \ s:dark_string,
+        \ s:dark_number,
+        \ s:dark_keyword,
+        \ s:dark_type,
+        \ s:dark_function,
+        \ s:dark_blue,
+        \ s:dark_orange_fg
+        \ ]
+
+  " Detect max number of columns
+  let max_cols = 0
+  for line in getline(1, '$')
+    let col_count = len(split(line, ',')) - 1
+    if col_count > max_cols
+      let max_cols = col_count
+    endif
+  endfor
+  let num_cols = max_cols + 1
+
+  for i in range(num_cols)
+    let group = 'csvCol' . (i + 1)
+    let pat   = '\v^([^,]*,){' . i . '}[^,]*'
+    let color = colors[i % len(colors)]
+    execute 'syntax match ' . group . ' /' . pat . '/ containedin=ALL'
+    execute 'highlight ' . group . ' guifg=' . color . ' ctermfg=' . (160 + (i % len(colors)))
+  endfor
+endfunction
 
