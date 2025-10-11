@@ -36,29 +36,50 @@ set ambiwidth=double      " 全角文字を幅2として扱います
 "===============================================================
 " クリップボード・検索設定
 "===============================================================
-set clipboard=unnamedplus " システムクリップボードと Vim のヤンクを共有します
+if has('clipboard')
+  set clipboard=unnamedplus " システムクリップボードと Vim のヤンクを共有します
+endif
 set wrapscan              " 検索時にファイル末尾→先頭へラップします
 set incsearch             " 入力しながら検索結果を逐次表示します
 set hlsearch              " 検索キーワードをハイライトします
 set ignorecase            " 検索で大文字小文字を区別しません
+set smartcase             " 検索語に大文字が含まれている場合のみ大文字小文字を区別します
 
 "===============================================================
 " プラグイン管理 (vim-plug)
 "===============================================================
+
 call plug#begin('~/.vim/plugged')
-  " ファイルツリー表示プラグイン
-  Plug 'preservim/nerdtree'
 call plug#end()
 
-" プラグインのキーマッピング設定
-nnoremap <C-n> :NERDTreeToggle<CR>  " Ctrl+n で NERDTree の表示/非表示を切替えます
-autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree")) | quit | endif "NERDTreeのみの時Vimを終了
+"===============================================================
+" Netrw を '-' で開く（Vinegar相当）
+"===============================================================
+nnoremap - :Explore<CR>  " 通常モードで '-' を押すと現在のファイルのディレクトリを開く
+let g:netrw_banner = 0       " 上部の説明バナーを非表示
+let g:netrw_liststyle = 3    " ツリー形式で表示
+let g:netrw_browse_split = 4 " 同一ウィンドウで開く
+let g:netrw_winsize = 20     " ウィンドウ幅を25に固定
+let g:netrw_fastbowse = 2
+augroup netrw_q_mapping
+  autocmd!
+  autocmd FileType netrw nnoremap <buffer> q : b#<CR>
+augroup END
+
 
 "===============================================================
 " シンタックスハイライト設定
 "===============================================================
+if has('termguicolors')
+  set termguicolors
+endif
+set background=dark
+
 syntax on                 " シンタックスハイライトを有効化します
-colorscheme lunaperche
+filetype on
+filetype plugin on
+colorscheme github  " ~/.vim/colors/github.vimを入れる
+source ~/.vim/colors/ft_custom.vim
 
 "===============================================================
 " 補完設定 
@@ -68,18 +89,7 @@ set wildmenu              " コマンドライン補完を強化します
 set history=5000          " コマンド・検索の履歴件数を設定します
 
 "===============================================================
-" howm (メモ管理) 設定
-"===============================================================
-set runtimepath+=~/.howm    " howmプラグインのパスを追加
-let qfixmemo_mapleader = 'f'    " howm起動のリーダーキーを設定
-let howm_dir             = '~/Dropbox/Editor/vim/howm'  " メモ保存先ディレクトリ
-let howm_filename        = '%Y/%m/%Y-%m-%d-%H%M%S.md'   " メモファイル名フォーマット
-let howm_fileencoding    = 'utf-8'  " メモファイルの文字コード
-let howm_fileformat      = 'unix'   " メモファイルの改行コード
-
-"===============================================================
 " XTerm 用ブラケットペースト対応
 "===============================================================
 nnoremap <F2> :set paste!<CR>:set paste?<CR>
-
 
