@@ -1,0 +1,28 @@
+# GitHub Theme Test YAML
+project:
+  name: "Vim Config"
+  version: 1.0
+  active: true
+  debug: false
+
+# 構造のテスト
+database:
+  adapter: postgresql
+  host: localhost
+  port: 5432
+  pool: 5
+
+# リストとネストのテスト
+services:
+  - web:
+      build: .
+      ports:
+        - "8080:80"
+  - db:
+      image: mariadb
+      restart: always
+
+# 複数行テキストのテスト
+description: |
+  This is a multi-line string.
+  It should be highlighted as a value.

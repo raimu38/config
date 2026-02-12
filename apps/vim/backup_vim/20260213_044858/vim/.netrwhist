@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =6
+let g:netrw_dirhist_6='/home/kougami/.android'
+let g:netrw_dirhist_5='/home/kougami'
+let g:netrw_dirhist_4='/home'
+let g:netrw_dirhist_3='/home/kougami'
+let g:netrw_dirhist_2='/home/kougami/Develop/Projects/gavlii/gavlii-v7/agent'
+let g:netrw_dirhist_1='/home/kougami/.ssh'
+let g:netrw_dirhist_0='/home/kougami/Develop/Projects/satopon/satopon_2'
+let g:netrw_dirhist_9='/home/kougami/Develop/Projects'
+let g:netrw_dirhist_8='/home/kougami/Develop/Projects/satopon/satopon_2'
+let g:netrw_dirhist_7='/home/kougami/Develop/Projects'

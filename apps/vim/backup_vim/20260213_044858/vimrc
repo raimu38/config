@@ -1,0 +1,85 @@
+"===============================================================
+" 基本設定 (Encoding, Backup, Buffer)
+"===============================================================
+set fenc=utf-8            " ファイルの内部エンコーディングを UTF-8 に統一します
+set nobackup              " ファイル保存時のバックアップファイル（~付き）を作成しません
+set noswapfile            " 編集中のスワップファイルを作成しません
+set autoread              " 他プロセスで変更されたファイルを自動的に再読み込みします
+set hidden                " 編集中のバッファを非表示にしても変更を保持します
+set encoding=utf-8
+set fileencodings=utf-8
+set fileencoding=utf-8
+set fileformats=unix
+set fileformat=unix
+
+"===============================================================
+" 表示・操作の基本設定 (UI, Cursor, Scrolling)
+"===============================================================
+set number                " 行番号を表示します
+set cursorline            " カーソル行をハイライトして視認性を向上させます
+set showmatch             " 対応する括弧を一瞬ハイライトします
+set scrolloff=5           " カーソル上下に最低5行の余白を確保します
+set sidescrolloff=8       " カーソル左右に最低8列の余白を確保します
+set lazyredraw            " 大量テキスト操作時に画面再描画を遅延させます
+set whichwrap=b,s,h,l,<,>,[,],~ " 行頭・行末での左右移動を行き来できるようにします
+
+"===============================================================
+" タブ・インデント設定
+"===============================================================
+set smartindent           " 文法に応じた自動インデントを行います
+set autoindent            " 新しい行に前行と同じインデントを設定します
+set expandtab             " タブ入力をスペースに変換します
+set tabstop=2             " タブ幅をスペース2文字分に設定します
+set shiftwidth=2          " 自動インデント幅を2スペースに設定します
+set ambiwidth=double      " 全角文字を幅2として扱います
+
+"===============================================================
+" クリップボード・検索設定
+"===============================================================
+if has('clipboard')
+  set clipboard=unnamedplus " システムクリップボードと Vim のヤンクを共有します
+endif
+set wrapscan              " 検索時にファイル末尾→先頭へラップします
+set incsearch             " 入力しながら検索結果を逐次表示します
+set hlsearch              " 検索キーワードをハイライトします
+set ignorecase            " 検索で大文字小文字を区別しません
+set smartcase             " 検索語に大文字が含まれている場合のみ大文字小文字を区別します
+
+"===============================================================
+" プラグイン管理 (vim-plug)
+"===============================================================
+
+call plug#begin('~/.vim/plugged')
+  Plug 'preservim/nerdtree' " ファイルツリー表示プラグイン
+call plug#end()
+
+nnoremap <C-n> :NERDTreeToggle<CR>  "Ctrl+n で NERDTree の表示/非表示を切替えます
+autocmd BufEnter * if (winnr("$") == 1 && exists("b:NERDTree")) | quit | endif "NERDTreeのみの時Vimを終了
+
+
+"===============================================================
+" シンタックスハイライト設定
+"===============================================================
+if has('termguicolors')
+  set termguicolors
+endif
+set background=dark
+
+syntax on                 " シンタックスハイライトを有効化します
+filetype on
+filetype plugin on
+colorscheme github  " ~/.vim/colors/github.vimを入れる
+"source ~/.vim/colors/ft_custom.vim
+
+"===============================================================
+" 補完設定 
+"===============================================================
+set completeopt=menu,menuone,noselect " 補完メニュー表示設定
+set wildmenu              " コマンドライン補完を強化します
+set history=5000          " コマンド・検索の履歴件数を設定します
+
+"===============================================================
+" XTerm 用ブラケットペースト対応
+"===============================================================
+nnoremap <F2> :set paste!<CR>:set paste?<CR>
+
